@@ -11,6 +11,7 @@ dependencies:
   dio: ^5.5.0+1
   equatable: ^2.0.3
   flutter_bloc: ^8.1.1
+  flutter_secure_storage: ^9.2.2
   formz: ^0.6.0
   flutter:
     sdk: flutter

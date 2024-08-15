@@ -1,12 +1,14 @@
 import 'dart:async';
 
 import 'package:flutter_bloc_auth/src/authentication/authentication_data_source.dart';
+import 'package:flutter_bloc_auth/src/authentication/token_data_source.dart';
 
 enum AuthenticationStatus { unknown, authenticated, unauthenticated }
 
 class AuthenticationRepository {
   final _controller = StreamController<AuthenticationStatus>();
   final _authenticationDataSource = AuthenticationDataSource();
+  final _tokenDataSource = TokenDataSource();
 
   Stream<AuthenticationStatus> get status async* {
     yield AuthenticationStatus.unknown;
@@ -19,14 +21,16 @@ class AuthenticationRepository {
     required String username,
     required String password,
   }) async {
-    await _authenticationDataSource.login(
+    final token = await _authenticationDataSource.login(
       username: username,
       password: password,
     );
+    await _tokenDataSource.saveToken(token: token);
     _controller.add(AuthenticationStatus.authenticated);
   }
 
-  void logOut() {
+  Future<void> logOut() async {
+    await _tokenDataSource.deleteToken();
     _controller.add(AuthenticationStatus.unauthenticated);
   }
 
