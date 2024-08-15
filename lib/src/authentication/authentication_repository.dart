@@ -56,5 +56,9 @@ class AuthenticationRepository {
     await _authenticationDataSource.verify(token: accessToken);
   }
 
+  Future<String?> getAccessToken() async {
+    return await _tokenDataSource.getAccessToken();
+  }
+
   void dispose() => _controller.close();
 }
