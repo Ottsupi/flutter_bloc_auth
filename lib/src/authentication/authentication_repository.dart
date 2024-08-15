@@ -1,9 +1,12 @@
 import 'dart:async';
 
+import 'package:flutter_bloc_auth/src/authentication/authentication_data_source.dart';
+
 enum AuthenticationStatus { unknown, authenticated, unauthenticated }
 
 class AuthenticationRepository {
   final _controller = StreamController<AuthenticationStatus>();
+  final _authenticationDataSource = AuthenticationDataSource();
 
   Stream<AuthenticationStatus> get status async* {
     yield AuthenticationStatus.unknown;
@@ -16,10 +19,11 @@ class AuthenticationRepository {
     required String username,
     required String password,
   }) async {
-    await Future.delayed(
-      const Duration(milliseconds: 300),
-      () => _controller.add(AuthenticationStatus.authenticated),
+    await _authenticationDataSource.login(
+      username: username,
+      password: password,
     );
+    _controller.add(AuthenticationStatus.authenticated);
   }
 
   void logOut() {
