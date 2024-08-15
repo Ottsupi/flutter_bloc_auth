@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_bloc_auth/src/authentication/authentication.dart';
 import 'package:flutter_bloc_auth/src/core/constants.dart';
 import 'package:flutter_bloc_auth/src/core/widgets.dart';
 
@@ -44,7 +46,8 @@ class Logout extends StatelessWidget {
       backgroundColor: Colors.red,
       foregroundColor: Colors.white,
       onPressed: () {
-        Navigator.of(context).pop();
+        BlocProvider.of<AuthenticationBloc>(context)
+            .add(AuthenticationLogoutRequested());
       },
     );
   }
