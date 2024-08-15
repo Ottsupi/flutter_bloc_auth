@@ -4,6 +4,7 @@ import 'package:flutter_bloc_auth/src/authentication/authentication.dart';
 import 'package:flutter_bloc_auth/src/authentication/authentication_repository.dart';
 import 'package:flutter_bloc_auth/src/core/constants.dart';
 import 'package:flutter_bloc_auth/src/core/router.dart';
+import 'package:get_it/get_it.dart';
 
 class MainApp extends StatefulWidget {
   const MainApp({super.key});
@@ -18,7 +19,7 @@ class _MainAppState extends State<MainApp> {
   @override
   void initState() {
     super.initState();
-    _authenticationRepository = AuthenticationRepository();
+    _authenticationRepository = GetIt.I.get<AuthenticationRepository>();
   }
 
   @override

@@ -4,7 +4,7 @@ import 'package:flutter_bloc_auth/src/core/api_client.dart';
 import 'package:flutter_bloc_auth/src/core/constants.dart';
 
 final class AuthenticationDataSource {
-  final Dio dio = ApiClient().dio;
+  final Dio dio = AuthApiClient().dio;
 
   Future<JwtModel> login({
     required String username,
