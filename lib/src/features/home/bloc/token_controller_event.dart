@@ -12,3 +12,5 @@ final class RetrieveTokens extends TokenControllerEvent {}
 final class RefreshTokens extends TokenControllerEvent {}
 
 final class VerifyAccessToken extends TokenControllerEvent {}
+
+final class GetRequest extends TokenControllerEvent {}

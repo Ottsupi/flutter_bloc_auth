@@ -2,6 +2,7 @@ import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc_auth/src/authentication/authentication_repository.dart';
 import 'package:flutter_bloc_auth/src/authentication/token_data_source.dart';
+import 'package:flutter_bloc_auth/src/features/hello/hello_repository.dart';
 
 part 'token_controller_event.dart';
 part 'token_controller_state.dart';
@@ -10,12 +11,16 @@ class TokenControllerBloc
     extends Bloc<TokenControllerEvent, TokenControllerState> {
   final TokenDataSource tokenDataSource = TokenDataSource();
   final AuthenticationRepository authenticationRepository;
+  final HelloRepository helloRepository;
 
-  TokenControllerBloc({required this.authenticationRepository})
-      : super(TokenControllerInitial()) {
+  TokenControllerBloc({
+    required this.authenticationRepository,
+    required this.helloRepository,
+  }) : super(TokenControllerInitial()) {
     on<RetrieveTokens>(_onRetrieveTokens);
     on<RefreshTokens>(_onRefreshTokens);
     on<VerifyAccessToken>(_onVerifyAccessToken);
+    on<GetRequest>(_onGetRequest);
   }
 
   _onRetrieveTokens(
@@ -50,5 +55,12 @@ class TokenControllerBloc
     Emitter<TokenControllerState> emit,
   ) async {
     await authenticationRepository.verifyAccessToken();
+  }
+
+  _onGetRequest(
+    GetRequest event,
+    Emitter<TokenControllerState> emit,
+  ) async {
+    await helloRepository.hello();
   }
 }

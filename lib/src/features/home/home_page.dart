@@ -4,6 +4,7 @@ import 'package:flutter_bloc_auth/src/authentication/authentication.dart';
 import 'package:flutter_bloc_auth/src/authentication/authentication_repository.dart';
 import 'package:flutter_bloc_auth/src/core/constants.dart';
 import 'package:flutter_bloc_auth/src/core/widgets.dart';
+import 'package:flutter_bloc_auth/src/features/hello/hello_repository.dart';
 import 'package:flutter_bloc_auth/src/features/home/bloc/token_controller_bloc.dart';
 
 class HomePage extends StatelessWidget {
@@ -19,12 +20,16 @@ class HomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (context) => TokenControllerBloc(
-        authenticationRepository:
-            RepositoryProvider.of<AuthenticationRepository>(context),
-      )..add(RetrieveTokens()),
-      child: HomeScreen(),
+    return RepositoryProvider(
+      create: (context) => HelloRepository(),
+      child: BlocProvider(
+        create: (context) => TokenControllerBloc(
+          authenticationRepository:
+              RepositoryProvider.of<AuthenticationRepository>(context),
+          helloRepository: RepositoryProvider.of<HelloRepository>(context),
+        )..add(RetrieveTokens()),
+        child: HomeScreen(),
+      ),
     );
   }
 }
@@ -119,9 +124,9 @@ class TokenControllerButtons extends StatelessWidget {
     return Column(
       children: [
         DisplayButtonWidget(
-          text: 'Retrieve Tokens',
+          text: 'Get Request',
           onPressed: () {
-            BlocProvider.of<TokenControllerBloc>(context).add(RetrieveTokens());
+            BlocProvider.of<TokenControllerBloc>(context).add(GetRequest());
           },
         ),
         SizedBox(height: 4),

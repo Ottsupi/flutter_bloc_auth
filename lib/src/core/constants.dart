@@ -10,4 +10,6 @@ final class ApiUrl {
   static const String login = '$baseUrl/auth/token/';
   static const String refresh = '$baseUrl/auth/token/refresh/';
   static const String verify = '$baseUrl/auth/token/verify/';
+
+  static const String hello = '$baseUrl/hello/user/';
 }
