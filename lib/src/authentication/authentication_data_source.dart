@@ -21,4 +21,26 @@ final class AuthenticationDataSource {
     );
     return JwtModel.fromJson(response.data);
   }
+
+  Future<JwtModel> refresh({required String refreshToken}) async {
+    Response response;
+    response = await dio.post(
+      ApiUrl.refresh,
+      data: {
+        'refresh': refreshToken,
+      },
+    );
+    return JwtModel.fromJson(response.data);
+  }
+
+  Future<void> verify({required String token}) async {
+    Response response;
+    response = await dio.post(
+      ApiUrl.verify,
+      data: {
+        'token': token,
+      },
+    );
+    response;
+  }
 }

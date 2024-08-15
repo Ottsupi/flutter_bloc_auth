@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter_bloc_auth/src/authentication/authentication_data_source.dart';
+import 'package:flutter_bloc_auth/src/authentication/jwt_model.dart';
 import 'package:flutter_bloc_auth/src/authentication/token_data_source.dart';
 
 enum AuthenticationStatus { unknown, authenticated, unauthenticated }
@@ -9,6 +10,7 @@ class AuthenticationRepository {
   final _controller = StreamController<AuthenticationStatus>();
   final _authenticationDataSource = AuthenticationDataSource();
   final _tokenDataSource = TokenDataSource();
+  bool _isRefresh = false;
 
   Stream<AuthenticationStatus> get status async* {
     yield AuthenticationStatus.unknown;
@@ -32,6 +34,26 @@ class AuthenticationRepository {
   Future<void> logOut() async {
     await _tokenDataSource.deleteToken();
     _controller.add(AuthenticationStatus.unauthenticated);
+  }
+
+  Future<void> refreshToken() async {
+    if (_isRefresh) return;
+
+    final String? refreshToken = await _tokenDataSource.getRefreshToken();
+    if (refreshToken == null) return logOut();
+
+    _isRefresh = true;
+    final JwtModel token = await _authenticationDataSource.refresh(
+      refreshToken: refreshToken,
+    );
+    await _tokenDataSource.saveToken(token: token);
+    _isRefresh = false;
+  }
+
+  Future<void> verifyAccessToken() async {
+    final String? accessToken = await _tokenDataSource.getAccessToken();
+    if (accessToken == null) return;
+    await _authenticationDataSource.verify(token: accessToken);
   }
 
   void dispose() => _controller.close();

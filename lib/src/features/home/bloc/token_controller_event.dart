@@ -8,3 +8,7 @@ sealed class TokenControllerEvent extends Equatable {
 }
 
 final class RetrieveTokens extends TokenControllerEvent {}
+
+final class RefreshTokens extends TokenControllerEvent {}
+
+final class VerifyAccessToken extends TokenControllerEvent {}

@@ -8,4 +8,6 @@ final class ApiUrl {
   static const String baseUrl = 'http://192.168.100.9:8080';
 
   static const String login = '$baseUrl/auth/token/';
+  static const String refresh = '$baseUrl/auth/token/refresh/';
+  static const String verify = '$baseUrl/auth/token/verify/';
 }

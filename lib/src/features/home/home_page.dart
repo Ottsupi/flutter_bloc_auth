@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_bloc_auth/src/authentication/authentication.dart';
+import 'package:flutter_bloc_auth/src/authentication/authentication_repository.dart';
 import 'package:flutter_bloc_auth/src/core/constants.dart';
 import 'package:flutter_bloc_auth/src/core/widgets.dart';
 import 'package:flutter_bloc_auth/src/features/home/bloc/token_controller_bloc.dart';
@@ -19,7 +20,10 @@ class HomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) => TokenControllerBloc()..add(RetrieveTokens()),
+      create: (context) => TokenControllerBloc(
+        authenticationRepository:
+            RepositoryProvider.of<AuthenticationRepository>(context),
+      )..add(RetrieveTokens()),
       child: HomeScreen(),
     );
   }
@@ -118,6 +122,25 @@ class TokenControllerButtons extends StatelessWidget {
           text: 'Retrieve Tokens',
           onPressed: () {
             BlocProvider.of<TokenControllerBloc>(context).add(RetrieveTokens());
+          },
+        ),
+        SizedBox(height: 4),
+        DisplayButtonWidget(
+          text: 'Refresh',
+          backgroundColor: Colors.green,
+          foregroundColor: Colors.white,
+          onPressed: () {
+            BlocProvider.of<TokenControllerBloc>(context).add(RefreshTokens());
+          },
+        ),
+        SizedBox(height: 4),
+        DisplayButtonWidget(
+          text: 'Verify',
+          backgroundColor: Colors.blue,
+          foregroundColor: Colors.white,
+          onPressed: () {
+            BlocProvider.of<TokenControllerBloc>(context)
+                .add(VerifyAccessToken());
           },
         ),
       ],
