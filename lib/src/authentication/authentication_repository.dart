@@ -10,13 +10,35 @@ class AuthenticationRepository {
   final _controller = StreamController<AuthenticationStatus>();
   final _authenticationDataSource = AuthenticationDataSource();
   final _tokenDataSource = TokenDataSource();
+
+  static const Duration _accessTokenValidity = Duration(seconds: 10);
+
   bool _isRefresh = false;
+  Timer _refreshTimer = Timer(Duration.zero, () {});
 
   Stream<AuthenticationStatus> get status async* {
     yield AuthenticationStatus.unknown;
     await Future<void>.delayed(const Duration(seconds: 1));
     yield AuthenticationStatus.unauthenticated;
     yield* _controller.stream;
+  }
+
+  Future<void> _saveToken(JwtModel token) async {
+    _startRefreshTimer();
+    await _tokenDataSource.saveToken(token: token);
+  }
+
+  Future<void> _deleteToken() async {
+    _refreshTimer.cancel();
+    await _tokenDataSource.deleteToken();
+  }
+
+  void _startRefreshTimer() {
+    _refreshTimer.cancel();
+    _refreshTimer = Timer(
+      _accessTokenValidity,
+      () => refreshToken(),
+    );
   }
 
   Future<void> logIn({
@@ -27,12 +49,12 @@ class AuthenticationRepository {
       username: username,
       password: password,
     );
-    await _tokenDataSource.saveToken(token: token);
+    await _saveToken(token);
     _controller.add(AuthenticationStatus.authenticated);
   }
 
   Future<void> logOut() async {
-    await _tokenDataSource.deleteToken();
+    await _deleteToken();
     _controller.add(AuthenticationStatus.unauthenticated);
   }
 
@@ -46,7 +68,7 @@ class AuthenticationRepository {
     final JwtModel token = await _authenticationDataSource.refresh(
       refreshToken: refreshToken,
     );
-    await _tokenDataSource.saveToken(token: token);
+    await _saveToken(token);
     _isRefresh = false;
   }
 
@@ -61,7 +83,7 @@ class AuthenticationRepository {
   }
 
   Future<void> expireSession() async {
-    await _tokenDataSource.deleteToken();
+    await _deleteToken();
     _controller.add(AuthenticationStatus.expired);
   }
 
