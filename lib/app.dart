@@ -56,6 +56,27 @@ class _AppViewState extends State<AppView> {
 
   NavigatorState get _navigator => _navigatorKey.currentState!;
 
+  void _showAuthenticationExpiredDialog() {
+    showDialog(
+      barrierDismissible: false,
+      context: _navigator.context,
+      builder: (context) => AlertDialog(
+        title: Text('Session Expired'),
+        content: Text('Your session has expired. Please log in again.'),
+        actions: [
+          TextButton(
+            onPressed: () {
+              BlocProvider.of<AuthenticationBloc>(context).add(
+                AuthenticationLogoutRequested(),
+              );
+            },
+            child: Text('Return to Log In'),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -76,6 +97,8 @@ class _AppViewState extends State<AppView> {
                   RouteName.loginPage,
                   (route) => false,
                 );
+              case AuthenticationStatus.expired:
+                _showAuthenticationExpiredDialog();
               case AuthenticationStatus.unknown:
                 return;
             }

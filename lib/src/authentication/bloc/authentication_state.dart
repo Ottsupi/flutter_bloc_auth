@@ -13,6 +13,9 @@ class AuthenticationState extends Equatable {
   const AuthenticationState.unauthenticated()
       : this._(status: AuthenticationStatus.unauthenticated);
 
+  const AuthenticationState.expired()
+      : this._(status: AuthenticationStatus.expired);
+
   final AuthenticationStatus status;
 
   @override

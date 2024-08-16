@@ -4,7 +4,7 @@ import 'package:flutter_bloc_auth/src/authentication/authentication_data_source.
 import 'package:flutter_bloc_auth/src/authentication/jwt_model.dart';
 import 'package:flutter_bloc_auth/src/authentication/token_data_source.dart';
 
-enum AuthenticationStatus { unknown, authenticated, unauthenticated }
+enum AuthenticationStatus { unknown, authenticated, unauthenticated, expired }
 
 class AuthenticationRepository {
   final _controller = StreamController<AuthenticationStatus>();
@@ -40,7 +40,7 @@ class AuthenticationRepository {
     if (_isRefresh) return;
 
     final String? refreshToken = await _tokenDataSource.getRefreshToken();
-    if (refreshToken == null) return logOut();
+    if (refreshToken == null) return await expireSession();
 
     _isRefresh = true;
     final JwtModel token = await _authenticationDataSource.refresh(
@@ -52,12 +52,17 @@ class AuthenticationRepository {
 
   Future<void> verifyAccessToken() async {
     final String? accessToken = await _tokenDataSource.getAccessToken();
-    if (accessToken == null) return;
+    if (accessToken == null) return await expireSession();
     await _authenticationDataSource.verify(token: accessToken);
   }
 
   Future<String?> getAccessToken() async {
     return await _tokenDataSource.getAccessToken();
+  }
+
+  Future<void> expireSession() async {
+    await _tokenDataSource.deleteToken();
+    _controller.add(AuthenticationStatus.expired);
   }
 
   void dispose() => _controller.close();

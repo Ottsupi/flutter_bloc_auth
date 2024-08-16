@@ -148,6 +148,15 @@ class TokenControllerButtons extends StatelessWidget {
                 .add(VerifyAccessToken());
           },
         ),
+        SizedBox(height: 4),
+        DisplayButtonWidget(
+          text: 'Expire Session',
+          backgroundColor: Colors.red,
+          foregroundColor: Colors.white,
+          onPressed: () {
+            BlocProvider.of<TokenControllerBloc>(context).add(ExpireSession());
+          },
+        ),
       ],
     );
   }

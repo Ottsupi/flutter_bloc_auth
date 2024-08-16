@@ -21,6 +21,7 @@ class TokenControllerBloc
     on<RefreshTokens>(_onRefreshTokens);
     on<VerifyAccessToken>(_onVerifyAccessToken);
     on<GetRequest>(_onGetRequest);
+    on<ExpireSession>(_onExpireSession);
   }
 
   _onRetrieveTokens(
@@ -62,5 +63,12 @@ class TokenControllerBloc
     Emitter<TokenControllerState> emit,
   ) async {
     await helloRepository.hello();
+  }
+
+  _onExpireSession(
+    ExpireSession event,
+    Emitter<TokenControllerState> emit,
+  ) async {
+    await authenticationRepository.expireSession();
   }
 }
