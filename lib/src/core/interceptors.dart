@@ -11,7 +11,8 @@ final class JwtInterceptor extends InterceptorsWrapper {
     RequestOptions options,
     RequestInterceptorHandler handler,
   ) async {
-    final String? accessToken = await authenticationRepository.getAccessToken();
+    final String? accessToken =
+        await authenticationRepository.getValidAccessToken();
     if (accessToken != null) {
       options.headers['Authorization'] = 'Bearer $accessToken';
     }

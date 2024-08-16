@@ -15,6 +15,7 @@ class AuthenticationRepository {
 
   bool _isRefresh = false;
   Timer _refreshTimer = Timer(Duration.zero, () {});
+  DateTime? _tokenTimeStamp;
 
   Stream<AuthenticationStatus> get status async* {
     yield AuthenticationStatus.unknown;
@@ -26,18 +27,20 @@ class AuthenticationRepository {
   Future<void> _saveToken(JwtModel token) async {
     _startRefreshTimer();
     await _tokenDataSource.saveToken(token: token);
+    _tokenTimeStamp = DateTime.now();
   }
 
   Future<void> _deleteToken() async {
     _refreshTimer.cancel();
     await _tokenDataSource.deleteToken();
+    _tokenTimeStamp = null;
   }
 
   void _startRefreshTimer() {
     _refreshTimer.cancel();
     _refreshTimer = Timer(
       _accessTokenValidity,
-      () => refreshToken(),
+      () => {},
     );
   }
 
@@ -80,6 +83,18 @@ class AuthenticationRepository {
 
   Future<String?> getAccessToken() async {
     return await _tokenDataSource.getAccessToken();
+  }
+
+  Future<String?> getValidAccessToken() async {
+    final bool isValid = isAccessTokenValid();
+    if (isValid) return getAccessToken();
+    await refreshToken();
+    return await getAccessToken();
+  }
+
+  bool isAccessTokenValid() {
+    if (_tokenTimeStamp == null) return false;
+    return DateTime.now().difference(_tokenTimeStamp!) < _accessTokenValidity;
   }
 
   Future<void> expireSession() async {
