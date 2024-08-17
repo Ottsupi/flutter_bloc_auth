@@ -12,6 +12,7 @@ class AuthenticationRepository {
   final _tokenDataSource = TokenDataSource();
 
   static const Duration _accessTokenValidity = Duration(seconds: 10);
+  static const Duration _refreshTokenValidity = Duration(seconds: 20);
 
   bool _isRefresh = false;
   Timer _refreshTimer = Timer(Duration.zero, () {});
@@ -39,8 +40,8 @@ class AuthenticationRepository {
   void _startRefreshTimer() {
     _refreshTimer.cancel();
     _refreshTimer = Timer(
-      _accessTokenValidity,
-      () => {},
+      _refreshTokenValidity,
+      () => expireSession(),
     );
   }
 
@@ -66,6 +67,7 @@ class AuthenticationRepository {
 
     final String? refreshToken = await _tokenDataSource.getRefreshToken();
     if (refreshToken == null) return await expireSession();
+    if (isRefreshTokenValid() == false) return await expireSession();
 
     _isRefresh = true;
     final JwtModel token = await _authenticationDataSource.refresh(
@@ -95,6 +97,11 @@ class AuthenticationRepository {
   bool isAccessTokenValid() {
     if (_tokenTimeStamp == null) return false;
     return DateTime.now().difference(_tokenTimeStamp!) < _accessTokenValidity;
+  }
+
+  bool isRefreshTokenValid() {
+    if (_tokenTimeStamp == null) return false;
+    return DateTime.now().difference(_tokenTimeStamp!) < _refreshTokenValidity;
   }
 
   Future<void> expireSession() async {
