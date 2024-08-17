@@ -2,21 +2,17 @@ import 'dart:async';
 
 import 'package:flutter_bloc_auth/src/authentication/authentication_data_source.dart';
 import 'package:flutter_bloc_auth/src/authentication/jwt_model.dart';
-import 'package:flutter_bloc_auth/src/authentication/token_data_source.dart';
+import 'package:flutter_bloc_auth/src/authentication/token_repository.dart';
 
 enum AuthenticationStatus { unknown, authenticated, unauthenticated, expired }
 
-class AuthenticationRepository {
+final class AuthenticationRepository {
   final _controller = StreamController<AuthenticationStatus>();
   final _authenticationDataSource = AuthenticationDataSource();
-  final _tokenDataSource = TokenDataSource();
+  final _tokenRepository = TokenRepository();
 
-  static const Duration _accessTokenValidity = Duration(seconds: 10);
-  static const Duration _refreshTokenValidity = Duration(seconds: 20);
-
-  bool _isRefresh = false;
+  bool _isRefreshing = false;
   Timer _refreshTimer = Timer(Duration.zero, () {});
-  DateTime? _tokenTimeStamp;
 
   Stream<AuthenticationStatus> get status async* {
     yield AuthenticationStatus.unknown;
@@ -25,26 +21,26 @@ class AuthenticationRepository {
     yield* _controller.stream;
   }
 
+  // Helper methods to maintain consistency
   Future<void> _saveToken(JwtModel token) async {
     _startRefreshTimer();
-    await _tokenDataSource.saveToken(token: token);
-    _tokenTimeStamp = DateTime.now();
+    await _tokenRepository.saveToken(token: token);
   }
 
   Future<void> _deleteToken() async {
     _refreshTimer.cancel();
-    await _tokenDataSource.deleteToken();
-    _tokenTimeStamp = null;
+    await _tokenRepository.deleteToken();
   }
 
   void _startRefreshTimer() {
     _refreshTimer.cancel();
     _refreshTimer = Timer(
-      _refreshTokenValidity,
+      TokenRepository.refreshTokenValidity,
       () => expireSession(),
     );
   }
 
+  // Controls app authentication state
   Future<void> logIn({
     required String username,
     required String password,
@@ -62,51 +58,41 @@ class AuthenticationRepository {
     _controller.add(AuthenticationStatus.unauthenticated);
   }
 
+  Future<void> expireSession() async {
+    await _deleteToken();
+    _controller.add(AuthenticationStatus.expired);
+  }
+
+  // Server authentication
   Future<void> refreshToken() async {
-    if (_isRefresh) return;
+    if (_isRefreshing) return;
 
-    final String? refreshToken = await _tokenDataSource.getRefreshToken();
+    final String? refreshToken = await _tokenRepository.getRefreshToken();
     if (refreshToken == null) return await expireSession();
-    if (isRefreshTokenValid() == false) return await expireSession();
+    if (_tokenRepository.isRefreshTokenValid() == false) {
+      return await expireSession();
+    }
 
-    _isRefresh = true;
+    _isRefreshing = true;
     final JwtModel token = await _authenticationDataSource.refresh(
       refreshToken: refreshToken,
     );
     await _saveToken(token);
-    _isRefresh = false;
+    _isRefreshing = false;
   }
 
   Future<void> verifyAccessToken() async {
-    final String? accessToken = await _tokenDataSource.getAccessToken();
+    final String? accessToken = await _tokenRepository.getAccessToken();
     if (accessToken == null) return await expireSession();
     await _authenticationDataSource.verify(token: accessToken);
   }
 
-  Future<String?> getAccessToken() async {
-    return await _tokenDataSource.getAccessToken();
-  }
-
+  // Returns an access token guaranteed to be valid.
   Future<String?> getValidAccessToken() async {
-    final bool isValid = isAccessTokenValid();
-    if (isValid) return getAccessToken();
+    final bool isValid = _tokenRepository.isAccessTokenValid();
+    if (isValid) return await _tokenRepository.getAccessToken();
     await refreshToken();
-    return await getAccessToken();
-  }
-
-  bool isAccessTokenValid() {
-    if (_tokenTimeStamp == null) return false;
-    return DateTime.now().difference(_tokenTimeStamp!) < _accessTokenValidity;
-  }
-
-  bool isRefreshTokenValid() {
-    if (_tokenTimeStamp == null) return false;
-    return DateTime.now().difference(_tokenTimeStamp!) < _refreshTokenValidity;
-  }
-
-  Future<void> expireSession() async {
-    await _deleteToken();
-    _controller.add(AuthenticationStatus.expired);
+    return await _tokenRepository.getAccessToken();
   }
 
   void dispose() => _controller.close();
