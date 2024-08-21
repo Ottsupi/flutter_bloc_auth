@@ -35,7 +35,7 @@ final class AuthenticationRepository {
   void _startRefreshTimer() {
     _refreshTimer.cancel();
     _refreshTimer = Timer(
-      TokenRepository.refreshTokenValidity,
+      _tokenRepository.refreshTokenValidity,
       () => expireSession(),
     );
   }

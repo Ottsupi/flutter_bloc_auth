@@ -5,11 +5,16 @@ final class RouteName {
 }
 
 final class ApiUrl {
-  static const String baseUrl = 'http://192.168.100.9:8080';
+  static const String baseUrl = 'http://192.168.100.205:8080';
 
   static const String login = '$baseUrl/auth/token/';
   static const String refresh = '$baseUrl/auth/token/refresh/';
   static const String verify = '$baseUrl/auth/token/verify/';
 
   static const String hello = '$baseUrl/hello/user/';
+}
+
+final class AppSetting {
+  static const Duration accessTokenValidity = Duration(seconds: 10);
+  static const Duration refreshTokenValidity = Duration(seconds: 20);
 }
