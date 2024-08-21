@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_bloc_auth/src/authentication/authentication.dart';
 import 'package:flutter_bloc_auth/src/authentication/authentication_repository.dart';
-import 'package:flutter_bloc_auth/src/core/constants.dart';
+import 'package:flutter_bloc_auth/src/authentication/bloc/authentication_listener.dart';
 import 'package:flutter_bloc_auth/src/core/router.dart';
 import 'package:get_it/get_it.dart';
 
@@ -56,27 +56,6 @@ class _AppViewState extends State<AppView> {
 
   NavigatorState get _navigator => _navigatorKey.currentState!;
 
-  void _showAuthenticationExpiredDialog() {
-    showDialog(
-      barrierDismissible: false,
-      context: _navigator.context,
-      builder: (context) => AlertDialog(
-        title: Text('Session Expired'),
-        content: Text('Your session has expired. Please log in again.'),
-        actions: [
-          TextButton(
-            onPressed: () {
-              BlocProvider.of<AuthenticationBloc>(context).add(
-                AuthenticationLogoutRequested(),
-              );
-            },
-            child: Text('Return to Log In'),
-          ),
-        ],
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -84,25 +63,8 @@ class _AppViewState extends State<AppView> {
       initialRoute: AppRouter.initialRoute,
       onGenerateRoute: AppRouter.generateRoute,
       builder: (context, child) {
-        return BlocListener<AuthenticationBloc, AuthenticationState>(
-          listener: (context, state) {
-            switch (state.status) {
-              case AuthenticationStatus.authenticated:
-                _navigator.pushNamedAndRemoveUntil(
-                  RouteName.homePage,
-                  (route) => false,
-                );
-              case AuthenticationStatus.unauthenticated:
-                _navigator.pushNamedAndRemoveUntil(
-                  RouteName.loginPage,
-                  (route) => false,
-                );
-              case AuthenticationStatus.expired:
-                _showAuthenticationExpiredDialog();
-              case AuthenticationStatus.unknown:
-                return;
-            }
-          },
+        return AuthenticationListener(
+          navigatorKey: _navigatorKey,
           child: child,
         );
       },
