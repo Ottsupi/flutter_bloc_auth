@@ -1,5 +1,5 @@
 import 'package:dio/dio.dart';
-import 'package:flutter_bloc_auth/src/authentication/authentication_repository.dart';
+import 'package:flutter_bloc_auth/src/authentication/repository.dart';
 import 'package:get_it/get_it.dart';
 
 final class JwtInterceptor extends InterceptorsWrapper {

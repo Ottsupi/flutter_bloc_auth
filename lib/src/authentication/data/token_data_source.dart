@@ -1,4 +1,4 @@
-import 'package:flutter_bloc_auth/src/authentication/jwt_model.dart';
+import 'package:flutter_bloc_auth/src/authentication/data/jwt_model.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 enum TokenStorage { access, refresh }

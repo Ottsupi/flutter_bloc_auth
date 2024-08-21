@@ -1,6 +1,6 @@
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
-import 'package:flutter_bloc_auth/src/authentication/authentication_repository.dart';
+import 'package:flutter_bloc_auth/src/authentication/repository.dart';
 import 'package:formz/formz.dart';
 
 part 'login_form_event.dart';

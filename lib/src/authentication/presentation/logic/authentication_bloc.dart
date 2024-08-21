@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
-import 'package:flutter_bloc_auth/src/authentication/authentication_repository.dart';
+import 'package:flutter_bloc_auth/src/authentication/domain/authentication_repository.dart';
 
 part 'authentication_event.dart';
 part 'authentication_state.dart';

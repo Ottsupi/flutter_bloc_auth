@@ -1,7 +1,7 @@
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
-import 'package:flutter_bloc_auth/src/authentication/authentication_repository.dart';
-import 'package:flutter_bloc_auth/src/authentication/token_data_source.dart';
+import 'package:flutter_bloc_auth/src/authentication/repository.dart';
+import 'package:flutter_bloc_auth/src/authentication/data/token_data_source.dart';
 import 'package:flutter_bloc_auth/src/features/hello/hello_repository.dart';
 
 part 'token_controller_event.dart';

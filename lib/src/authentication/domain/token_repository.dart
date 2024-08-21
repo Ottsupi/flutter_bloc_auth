@@ -1,5 +1,5 @@
-import 'package:flutter_bloc_auth/src/authentication/jwt_model.dart';
-import 'package:flutter_bloc_auth/src/authentication/token_data_source.dart';
+import 'package:flutter_bloc_auth/src/authentication/data/jwt_model.dart';
+import 'package:flutter_bloc_auth/src/authentication/data/token_data_source.dart';
 import 'package:flutter_bloc_auth/src/core/constants.dart';
 
 final class TokenRepository {

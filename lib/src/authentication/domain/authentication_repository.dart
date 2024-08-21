@@ -1,8 +1,8 @@
 import 'dart:async';
 
-import 'package:flutter_bloc_auth/src/authentication/authentication_data_source.dart';
-import 'package:flutter_bloc_auth/src/authentication/jwt_model.dart';
-import 'package:flutter_bloc_auth/src/authentication/token_repository.dart';
+import 'package:flutter_bloc_auth/src/authentication/data/authentication_data_source.dart';
+import 'package:flutter_bloc_auth/src/authentication/data/jwt_model.dart';
+import 'package:flutter_bloc_auth/src/authentication/domain/token_repository.dart';
 
 enum AuthenticationStatus { unknown, authenticated, unauthenticated, expired }
 
